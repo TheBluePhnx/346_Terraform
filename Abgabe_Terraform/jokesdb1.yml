@@ -1,0 +1,70 @@
+---
+- name: Install JokesDB
+  hosts: web
+  remote_user: ubuntu
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.10
+    database_endpoint: terraform-20240126082829527000000001.coqgsykgvgov.us-east-1.rds.amazonaws.com
+
+  tasks:
+  - name: Update package cache
+    ansible.builtin.apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+  - name: Install wget
+    ansible.builtin.apt:
+      pkg: wget
+      state: latest
+
+  - name: Install Maven
+    ansible.builtin.apt:
+      pkg: maven
+      state: latest
+
+  - name: Install OpenJDK
+    ansible.builtin.apt:
+      pkg: 
+      - openjdk-18-jdk
+      - openjdk-18-demo
+      - openjdk-18-doc
+      - openjdk-18-jre-headless
+      - openjdk-18-source
+      state: latest
+
+  - name: Install Pip
+    ansible.builtin.apt:
+      pkg: python3-pip
+      state: latest
+      update_cache: yes
+      force: true
+
+  - name: Install PyMySQL
+    ansible.builtin.pip:
+      name: PyMySQL
+
+  - name: Clone Git repository
+    ansible.builtin.git:
+      repo: https://gitlab.com/bbwrl/m346-ref-card-03.git
+      dest: /srv/m346-ref-card-03
+      version: main
+      force: true
+
+#  - name: copy properties
+#    ansible.builtin.copy:
+#      src: application.properties
+#      dest: /srv/m346-ref-card-03/src/main/resources/application.properties
+
+  - name: Build Maven project
+    ansible.builtin.command:
+      cmd: mvn package
+    args:
+      chdir: /srv/m346-ref-card-03
+
+  - name: Run Java application
+    ansible.builtin.command: "java -DDB_USERNAME='jokedbuser' -DDB_PASSWORD='12345678' -jar -DDB_URL=jdbc:mariadb://{{ database_endpoint }}:3306/jokedb target/architecture-refcard-03-0.0.1-SNAPSHOT.jar"
+    args:
+      chdir: /srv/m346-ref-card-03
+    tags:
+      - app
