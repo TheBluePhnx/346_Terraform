@@ -1,1 +1,2 @@
-# 346_Terraform
+# Reflexion Terraform
+Das Terraform selbst war für mich möglich um es selbst zusammen zu bauen, so dass es reibungslos funktioniert. Das installieren der JokesDB mittels Ansible erwies sich dann jedoch als sehr schwierig. Schlussendlich konnte ich es nur mit der Hilfe von Herr Rüttimann zum laufen bringen. Die benötigten Befehle hatte ich bereits im Skript, jedoch waren diese teilweise nicht korrekt konfiguriert. Zudem war es mir bis dahin nicht klar, dass mit Terraform bereits eine Datenbank erstellt wurde. Ich dachte es sein nur der dienst für MariaDB installiert worden.
